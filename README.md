@@ -12,7 +12,7 @@ Tested on Sql Server 2019 Linux and Sql Server 2014 SP3
 Usage:
 
 ```
-SqlServerSchemaComparison.exe --source file.yaml
+SqlServerSchemaComparison.exe with config.yaml in the same folder
 ```
 
 * TODO
