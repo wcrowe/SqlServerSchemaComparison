@@ -51,6 +51,7 @@ namespace SqlServerSchemaChanges
             var src = compareResult.GenerateScript(options.Comparetype).Script;
             if (src == null)
             {
+                diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
             using (StreamWriter writer = System.IO.File.CreateText($"compare_changes{fileDateTimeStamp}.sql"))
@@ -94,6 +95,7 @@ namespace SqlServerSchemaChanges
             var src = compareResult.GenerateScript(options.Comparetype).Script;
             if (src == null)
             {
+                diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
             using (StreamWriter writer = System.IO.File.CreateText($"compare_rollback{fileDateTimeStamp}.sql"))

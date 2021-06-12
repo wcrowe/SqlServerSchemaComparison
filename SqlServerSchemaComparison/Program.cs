@@ -127,6 +127,7 @@ namespace SqlServerSchemaComparison
 
             if (compareResult.Differences.Count() == 0)
             {
+                diffs += "No differences detected";
                 Console.WriteLine("No differences detected");
             }
             else
@@ -209,6 +210,7 @@ namespace SqlServerSchemaComparison
 
             if (compareResult.Differences.Count() == 0)
             {
+                diffs += "No differences detected";
                 Console.WriteLine("No differences detected");
             }
             else
