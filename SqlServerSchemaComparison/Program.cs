@@ -74,13 +74,15 @@ namespace SqlServerSchemaComparison
             //SchemaComparisonExcludedObjectId objid = new SchemaComparisonExcludedObjectId()
             //comparison.ExcludedSourceObjects.Add();
             SchemaComparisonResult compareResult = comparison.Compare();
-
-            foreach (SchemaDifference diff in compareResult.Differences)
+            string diffs = string.Empty;
+;            foreach (SchemaDifference diff in compareResult.Differences)
             {
                 string objectType = diff.Name;
                 //object name "SqlProcedure"
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+                
+                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}"  + Environment.NewLine;
                 Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
                 if (diff.TargetObject != null)
                 {
@@ -103,6 +105,7 @@ namespace SqlServerSchemaComparison
                     var query = enumerable();
                     if (query.Any())
                     {
+                        diffs += $"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                         Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
                         continue;
                     }
@@ -138,6 +141,11 @@ namespace SqlServerSchemaComparison
                     writer.Write(src);
                     writer.Flush();
                 }
+                using (StreamWriter writer = File.CreateText($"diffs{fileDateTimeStamp}.txt"))
+                {
+                    writer.Write(diffs);
+                    writer.Flush();
+                }
 
                 // var scriptWriter = new System.IO.StreamWriter(logFile);
             }
@@ -154,7 +162,9 @@ namespace SqlServerSchemaComparison
             var targetDatabase = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
             var sourceDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
             // Run reverse
+            string diffs = string.Empty;
             var comparison = new SchemaComparison(sourceDatabase, targetDatabase);
+
             Console.WriteLine("Running rollback creator...");
             SchemaComparisonResult compareResult = comparison.Compare();
 
@@ -164,6 +174,7 @@ namespace SqlServerSchemaComparison
                 //object name "SqlProcedure"
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                 Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
                 if (diff.TargetObject != null)
                 {
@@ -186,6 +197,7 @@ namespace SqlServerSchemaComparison
                     var query = enumerable();
                     if (query.Any())
                     {
+                        diffs += $"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                         Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
                         continue;
                     }
@@ -217,6 +229,7 @@ namespace SqlServerSchemaComparison
                     writer.Write(src);
                     writer.Flush();
                 }
+
 
             }
 

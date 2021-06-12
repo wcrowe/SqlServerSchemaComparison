@@ -86,12 +86,17 @@ namespace SqlServerSchemaChanges
             {
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText("compare_rollback.sql"))
+            using (StreamWriter writer = System.IO.File.CreateText($"compare_rollback{fileDateTimeStamp}.sql"))
             {
                 writer.Write(src);
                 writer.Flush();
             }
 
+            using (StreamWriter writer = File.CreateText($"rolls{fileDateTimeStamp}.txt"))
+            {
+                writer.Write(diffs);
+                writer.Flush();
+            }
 
         }
 
