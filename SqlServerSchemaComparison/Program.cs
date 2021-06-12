@@ -3,6 +3,7 @@ using Microsoft.SqlServer.Dac.Compare;
 using System;
 using System.IO;
 using System.Linq;
+using YamlDotNet.Serialization;
 
 namespace SqlServerSchemaComparison
 {
@@ -24,11 +25,23 @@ namespace SqlServerSchemaComparison
 
         static void Main(string[] args)
         {
-            CommandLine.Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(RunSchemaCompare);
+            
+            //CommandLine.Parser.Default.ParseArguments<Options>(args)
+            //    .WithParsed(RunSchemaCompare);
+            using (StreamReader reader = System.IO.File.OpenText("config.yaml"))
+            {
+                var conf = reader.ReadToEnd();
+                var deserializer = new DeserializerBuilder()
+                    .Build();
+
+                var yamldoc = deserializer.Deserialize<YamlSchema>(conf);
+                //CommandLine.Parser.Default.ParseArguments<Options>(args)
+                //    .WithParsed(RunSchemaCompare);
+                RunSchemaCompare(yamldoc);
+            }
         }
 
-        private static void RunSchemaCompare(Options options)
+        private static void RunSchemaCompare(YamlSchema options)
         {
             //C:\Users\crowe\source\repos\NorthWind\NorthWind\bin\Debug\NorthWind.dacpac
             //  to use a dapac file stuff
