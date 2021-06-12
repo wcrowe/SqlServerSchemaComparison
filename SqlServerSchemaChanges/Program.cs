@@ -23,6 +23,7 @@ namespace SqlServerSchemaChanges
                  RunSchemaCompare(yamldoc);
                 RunRollBackCreator(yamldoc);
             }
+            File.Copy("config.yaml", $"config{ fileDateTimeStamp}.yaml");
         }
 
         private static void RunSchemaCompare(YamlSchema options)
@@ -38,12 +39,13 @@ namespace SqlServerSchemaChanges
             var comparison = new SchemaComparison(sourceDatabase, targetDatabase);
             Console.WriteLine("Running schema comparison...");
             SchemaComparisonResult compareResult = comparison.Compare();
-
+            string diffs = string.Empty;
             foreach (SchemaDifference diff in compareResult.Differences)
             {
                 string objectType = diff.Name;
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                 Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
             }
             var src = compareResult.GenerateScript(options.Comparetype).Script;
@@ -51,9 +53,14 @@ namespace SqlServerSchemaChanges
             {
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText("compare_changes.sql"))
+            using (StreamWriter writer = System.IO.File.CreateText($"compare_changes{fileDateTimeStamp}.sql"))
             {
                 writer.Write(src);
+                writer.Flush();
+            }
+            using (StreamWriter writer = File.CreateText($"diffs_{fileDateTimeStamp}.txt"))
+            {
+                writer.Write(diffs);
                 writer.Flush();
             }
 
@@ -74,12 +81,15 @@ namespace SqlServerSchemaChanges
             var comparison = new SchemaComparison(targetDatabase, sourceDatabase);
             Console.WriteLine("Running rollback script creator...");
             SchemaComparisonResult compareResult = comparison.Compare();
-
+            string diffs = string.Empty;
             foreach (SchemaDifference diff in compareResult.Differences)
             {
                 string objectType = diff.Name;
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
+                Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+
             }
             var src = compareResult.GenerateScript(options.Comparetype).Script;
             if (src == null)
@@ -92,11 +102,12 @@ namespace SqlServerSchemaChanges
                 writer.Flush();
             }
 
-            using (StreamWriter writer = File.CreateText($"rolls{fileDateTimeStamp}.txt"))
+            using (StreamWriter writer = File.CreateText($"rolls_{fileDateTimeStamp}.txt"))
             {
                 writer.Write(diffs);
                 writer.Flush();
             }
+
 
         }
 

@@ -141,12 +141,7 @@ namespace SqlServerSchemaComparison
                     writer.Write(src);
                     writer.Flush();
                 }
-                using (StreamWriter writer = File.CreateText($"diffs{fileDateTimeStamp}.txt"))
-                {
-                    writer.Write(diffs);
-                    writer.Flush();
-                }
-
+  
                 // var scriptWriter = new System.IO.StreamWriter(logFile);
             }
 
@@ -197,7 +192,6 @@ namespace SqlServerSchemaComparison
                     var query = enumerable();
                     if (query.Any())
                     {
-                        diffs += $"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                         Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
                         continue;
                     }
