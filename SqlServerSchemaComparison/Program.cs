@@ -75,82 +75,50 @@ namespace SqlServerSchemaComparison
             //comparison.ExcludedSourceObjects.Add();
             SchemaComparisonResult compareResult = comparison.Compare();
             string diffs = string.Empty;
-;            foreach (SchemaDifference diff in compareResult.Differences)
+            foreach (SchemaDifference diff in compareResult.Differences)
             {
                 string objectType = diff.Name;
-                //object name "SqlProcedure"
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
-                
-                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}"  + Environment.NewLine;
+                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                 Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                if (diff.TargetObject != null)
+                var parts = diff.SourceObject.Name.Parts;
+                if (parts.Count == 2)
                 {
-                    System.Collections.Generic.IEnumerable<string> enumerable()
+                    var searchFor = parts[1];
+                    if (options.Includes.Any(x => x.ObjectName == searchFor))
                     {
-                        var parts = diff.SourceObject.Name.Parts;
-                        var includes = options.Includes;
-                        foreach (var firstItem in parts)
-                        {
-                            foreach (var secondItem in includes)
-                            {
-                                if (object.Equals(firstItem, secondItem.ObjectName))
-                                {
-                                    yield return firstItem;
-                                }
-                            }
-                        }
-                    }
 
-                    var query = enumerable();
-                    if (query.Any())
-                    {
-                        diffs += $"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
-                        Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                        continue;
                     }
                     else
                     {
                         compareResult.Exclude(diff);
-
                     }
+
+
+                }
+                else
+                {
+                    compareResult.Exclude(diff);
                 }
             }
-            //foreach (var diff in compareResult.Differences.Where(x => x.UpdateAction == SchemaUpdateAction.Delete))
-            //{
-            //    compareResult.Exclude(diff);
-            //}
-            //foreach (var diff in compareResult.Differences.Where(x => x.TargetObject.Name.Parts.Contains("SelectCustomers")))
-            //{
-            //    compareResult.Exclude(diff);
-            //}
-
-            if (compareResult.Differences.Count() == 0)
+            var src = compareResult.GenerateScript(options.Comparetype).Script;
+            if (src == null)
             {
                 diffs += "No differences detected";
-                Console.WriteLine("No differences detected");
+                Console.WriteLine("No differences to script");
             }
-            else
+            using (StreamWriter writer = System.IO.File.CreateText($"changes{fileDateTimeStamp}.sql"))
             {
-                var src = compareResult.GenerateScript(options.Comparetype).Script;
-                if (src == null)
-                {
-                    Console.WriteLine("No differences to script");
-                }
-                using (StreamWriter writer = System.IO.File.CreateText($"changes{fileDateTimeStamp}.sql"))
-                {
-                    writer.Write(src);
-                    writer.Flush();
-                }
-                using (StreamWriter writer = File.CreateText($"diff_changes_{fileDateTimeStamp}.txt"))
-                {
-                    writer.Write(diffs);
-                    writer.Flush();
-                }
-
-
-                // var scriptWriter = new System.IO.StreamWriter(logFile);
+                writer.Write(src);
+                writer.Flush();
             }
+            using (StreamWriter writer = File.CreateText($"differences_{fileDateTimeStamp}.txt"))
+            {
+                writer.Write(diffs);
+                writer.Flush();
+            }
+
 
         }
 
@@ -178,35 +146,26 @@ namespace SqlServerSchemaComparison
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
                 diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
                 Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                if (diff.TargetObject != null)
-                {
-                    System.Collections.Generic.IEnumerable<string> enumerable()
-                    {
-                        var parts = diff.TargetObject.Name.Parts;
-                        var includes = options.Includes;
-                        foreach (var firstItem in parts)
-                        {
-                            foreach (var secondItem in includes)
-                            {
-                                if (object.Equals(firstItem, secondItem.ObjectName))
-                                {
-                                    yield return firstItem;
-                                }
-                            }
-                        }
-                    }
 
-                    var query = enumerable();
-                    if (query.Any())
+                if (diff.SourceObject is null)
+                {
+                    continue;
+                }
+                var parts = diff.SourceObject.Name.Parts;
+
+                if (parts.Count == 2)
+                {
+                    var searchFor = parts[1];
+                    if (options.Includes.Any(x => x.ObjectName == searchFor))
                     {
-                        Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                        continue;
+
                     }
                     else
                     {
                         compareResult.Exclude(diff);
-
                     }
+
+
                 }
                 else
                 {
@@ -214,31 +173,24 @@ namespace SqlServerSchemaComparison
                 }
             }
 
-            if (compareResult.Differences.Count() == 0)
+            var src = compareResult.GenerateScript(options.Comparetype).Script;
+            if (src == null)
             {
-                diffs += "No differences detected";
-                Console.WriteLine("No differences detected");
+                Console.WriteLine("No differences to script");
             }
-            else
+            using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
             {
-                var src = compareResult.GenerateScript(options.Comparetype).Script;
-                if (src == null)
-                {
-                    Console.WriteLine("No differences to script");
-                }
-                using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
-                {
-                    writer.Write(src);
-                    writer.Flush();
-                }
-                using (StreamWriter writer = File.CreateText($"difs_roll_{fileDateTimeStamp}.txt"))
-                {
-                    writer.Write(diffs);
-                    writer.Flush();
-                }
+                writer.Write(src);
+                writer.Flush();
+            }
+            using (StreamWriter writer = File.CreateText($"difs_ro{fileDateTimeStamp}.txt"))
+            {
+                writer.Write(diffs);
+                writer.Flush();
+            }
 
 
-            }
+
 
         }
 

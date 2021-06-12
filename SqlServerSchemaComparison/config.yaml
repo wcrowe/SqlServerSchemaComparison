@@ -9,10 +9,6 @@ Includes:
 - DatabaseName: work
   Schema: dbo
   ObjectType: SqlProcedure
-  ObjectName: SelectCustomers
-- DatabaseName: work
-  Schema: dbo
-  ObjectType: SqlProcedure
   ObjectName: CustOrdersOrders
 - DatabaseName: work
   Schema: dbo
