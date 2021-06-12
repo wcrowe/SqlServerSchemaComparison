@@ -21,11 +21,10 @@ namespace SqlServerSchemaComparison
 
     class Program
     {
-        private static object src;
-
+   
         static void Main(string[] args)
         {
-            
+
             //CommandLine.Parser.Default.ParseArguments<Options>(args)
             //    .WithParsed(RunSchemaCompare);
             using (StreamReader reader = System.IO.File.OpenText("config.yaml"))
@@ -38,6 +37,7 @@ namespace SqlServerSchemaComparison
                 //CommandLine.Parser.Default.ParseArguments<Options>(args)
                 //    .WithParsed(RunSchemaCompare);
                 RunSchemaCompare(yamldoc);
+                RunRollBackGen(yamldoc);
             }
         }
 
@@ -61,12 +61,12 @@ namespace SqlServerSchemaComparison
             if (options.TargetConnectionString is null)
                 throw new ArgumentNullException("target", "The target database connection string is required");
 
-            var sourceDatabaae = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString);
+            var sourceDatabaae = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
             //var sourceDacpac = new SchemaCompareDacpacEndpoint(options.SourceDacPac);
-            var targetDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString);
+            var targetDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
 
             //var comparison = new SchemaComparison(sourceDacpac, targetDatabase);
-             var comparison = new SchemaComparison(sourceDatabaae, targetDatabase);
+            var comparison = new SchemaComparison(sourceDatabaae, targetDatabase);
             Console.WriteLine("Running schema comparison...");
             //SchemaComparisonExcludedObjectId objid = new SchemaComparisonExcludedObjectId()
             //comparison.ExcludedSourceObjects.Add();
@@ -78,10 +78,16 @@ namespace SqlServerSchemaComparison
                 //object name "SqlProcedure"
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
-                if (diff.TargetObject.Name.Parts.Contains("SelectCustomers"))
-                {
-                    Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
 
+                    var query = from firstItem in diff.TargetObject.Name.Parts
+                                join secondItem in options.Includes
+                                on firstItem equals secondItem.ObjectName
+                                select firstItem;
+                if (query.Any())
+                {
+                    Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                    continue;
                 }
                 else
                 {
@@ -104,14 +110,14 @@ namespace SqlServerSchemaComparison
             }
             else
             {
-                var scr = compareResult.GenerateScript("northwind").Script;
+                var src = compareResult.GenerateScript(options.Comparetype).Script;
                 if (src == null)
                 {
                     Console.WriteLine("No differences to script");
                 }
-                using (StreamWriter writer = System.IO.File.AppendText("changes.sql"))
+                using (StreamWriter writer = System.IO.File.CreateText("changes.sql"))
                 {
-                    writer.Write(scr);
+                    writer.Write(src);
                     writer.Flush();
                 }
 
@@ -119,5 +125,63 @@ namespace SqlServerSchemaComparison
             }
 
         }
+
+        private static void RunRollBackGen(YamlSchema options)
+        {
+            if (options.SourceConnectionString is null)
+                throw new ArgumentNullException("source", "The source .dacpac file is required");
+            if (options.TargetConnectionString is null)
+                throw new ArgumentNullException("target", "The target database connection string is required");
+
+            var sourceDatabaae = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
+            var targetDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
+            // Run reverse
+            var comparison = new SchemaComparison(targetDatabase, sourceDatabaae);
+            Console.WriteLine("Running rollback creator...");
+            SchemaComparisonResult compareResult = comparison.Compare();
+
+            foreach (SchemaDifference diff in compareResult.Differences)
+            {
+                string objectType = diff.Name;
+                string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
+                string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+
+                var query = from firstItem in diff.TargetObject.Name.Parts
+                            join secondItem in options.Includes
+                            on firstItem equals secondItem.ObjectName
+                            select firstItem;
+                if (query.Any())
+                {
+                    Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                    continue;
+                }
+                else
+                {
+                    compareResult.Exclude(diff);
+
+                }
+            }
+
+            if (compareResult.Differences.Count() == 0)
+            {
+                Console.WriteLine("No differences detected");
+            }
+            else
+            {
+                var src = compareResult.GenerateScript(options.Comparetype).Script;
+                if (src == null)
+                {
+                    Console.WriteLine("No differences to script");
+                }
+                using (StreamWriter writer = System.IO.File.CreateText("rollback.sql"))
+                {
+                    writer.Write(src);
+                    writer.Flush();
+                }
+
+            }
+
+        }
+
     }
 }
