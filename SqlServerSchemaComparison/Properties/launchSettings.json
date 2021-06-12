@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SqlServerSchemaComparison": {
+      "commandName": "Project",
+      "commandLineArgs": "-s  \"Data Source=localhost,1401;Initial Catalog=Northwind;Persist Security Info=True;User ID=sa;Password=Mustang74\" -t \"Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74\""
+    }
+  }
+}
