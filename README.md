@@ -7,7 +7,7 @@ Crates rollback script.
 Uses yaml config files.
 
 SqlServerSchemaComparison allows you to specify which databases and which objects to include using config.yaml file.
-
+Tested on Sql Server 2019 Linux and Sql Server 2014 SP3
 
 Usage:
 
