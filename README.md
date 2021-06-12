@@ -25,5 +25,5 @@ SqlServerSchemaComparison.exe --source file.yaml
         * yaml to include object types, object type and name, or wildcard * include everything.  Works with object name only now.
         * paramaters -s source yaml -o output sql file overrides yaml SqlServerSchemaComparison.exe --source file.yaml --output changesforprod.sql
 
-#SqlServerSchemaChanges
+# SqlServerSchemaChanges
 Program scripts all the changes for a database and scripts rollback.  Wrote this to figure out Sql Object types returned from dac compare.
