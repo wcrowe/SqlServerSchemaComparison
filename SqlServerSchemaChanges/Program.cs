@@ -54,12 +54,12 @@ namespace SqlServerSchemaChanges
                 diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText($"compare_changes{fileDateTimeStamp}.sql"))
+            using (StreamWriter writer = System.IO.File.CreateText($"changes{fileDateTimeStamp}.sql"))
             {
                 writer.Write(src);
                 writer.Flush();
             }
-            using (StreamWriter writer = File.CreateText($"diffs_{fileDateTimeStamp}.txt"))
+            using (StreamWriter writer = File.CreateText($"differences_{fileDateTimeStamp}.txt"))
             {
                 writer.Write(diffs);
                 writer.Flush();
@@ -98,7 +98,7 @@ namespace SqlServerSchemaChanges
                 diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText($"compare_rollback{fileDateTimeStamp}.sql"))
+            using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
             {
                 writer.Write(src);
                 writer.Flush();

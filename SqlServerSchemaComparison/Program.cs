@@ -142,7 +142,13 @@ namespace SqlServerSchemaComparison
                     writer.Write(src);
                     writer.Flush();
                 }
-  
+                using (StreamWriter writer = File.CreateText($"diff_changes_{fileDateTimeStamp}.txt"))
+                {
+                    writer.Write(diffs);
+                    writer.Flush();
+                }
+
+
                 // var scriptWriter = new System.IO.StreamWriter(logFile);
             }
 
@@ -223,6 +229,11 @@ namespace SqlServerSchemaComparison
                 using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
                 {
                     writer.Write(src);
+                    writer.Flush();
+                }
+                using (StreamWriter writer = File.CreateText($"difs_roll_{fileDateTimeStamp}.txt"))
+                {
+                    writer.Write(diffs);
                     writer.Flush();
                 }
 

@@ -16,5 +16,9 @@ Includes:
   ObjectName: CustOrdersOrders
 - DatabaseName: work
   Schema: dbo
-  ObjectType: Table
-  ObjectName: Testing
+  ObjectType: SqlTable
+  ObjectName: Categories
+
+
+
+  
