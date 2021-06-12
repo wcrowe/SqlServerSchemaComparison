@@ -1,5 +1,5 @@
 # SqlServerSchemaComparison
-Wrote this is the middle of the night.
+Quick and dirty written at 3:00AM on a Friday night.
 Insperation https://github.com/reid15/DatabaseCommon 
 Couple of dotnet core programs that automate schema compares.
 Creates change script.
@@ -25,3 +25,5 @@ SqlServerSchemaComparison.exe --source file.yaml
         * yaml to include object types, object type and name, or wildcard * include everything.  Works with object name only now.
         * paramaters -s source yaml -o output sql file overrides yaml SqlServerSchemaComparison.exe --source file.yaml --output changesforprod.sql
 
+#SqlServerSchemaChanges
+Program scripts all the changes for a database and scripts rollback.  Wrote this to figure out Sql Object types returned from dac compare.
