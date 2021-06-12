@@ -1,0 +1,32 @@
+Comparetype: ConnectionStrings
+SourceConnectionString:
+  Name: SourceConntion
+  ConnectionString: Data Source=localhost,1401;Initial Catalog=northwind;Persist Security Info=True;User ID=sa;Password=Mustang74
+TargetConnectionString:
+  Name: TargetConntion
+  ConnectionString: Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74
+Includes:
+- DatabaseName: work
+  Schema: dbo
+  ObjectType: SqlProcedure
+  ObjectName: SelectCustomers
+- DatabaseName: work
+  Schema: dbo
+  ObjectType: Table
+  ObjectName: Testing
+Comparetype: ConnectionStrings
+SourceConnectionString:
+  Name: SourceConntion
+  ConnectionString: Data Source=localhost,1401;Initial Catalog=northwind;Persist Security Info=True;User ID=sa;Password=Mustang74
+TargetConnectionString:
+  Name: TargetConntion
+  ConnectionString: Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74
+Includes:
+- DatabaseName: work
+  Schema: dbo
+  ObjectType: SqlProcedure
+  ObjectName: SelectCustomers
+- DatabaseName: work
+  Schema: dbo
+  ObjectType: Table
+  ObjectName: Testing
