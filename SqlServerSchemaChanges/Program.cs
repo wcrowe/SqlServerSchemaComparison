@@ -9,9 +9,10 @@ namespace SqlServerSchemaChanges
     class Program
     {
 
-
+        private static string fileDateTimeStamp;
         static void Main(string[] args)
         {
+            fileDateTimeStamp = DateTime.Now.ToString("yyyyMMddhhmmss");
             using (StreamReader reader = System.IO.File.OpenText("config.yaml"))
             {
                 var conf = reader.ReadToEnd();
@@ -70,7 +71,7 @@ namespace SqlServerSchemaChanges
             var sourceDatabase = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
             var targetDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
 
-            var comparison = new SchemaComparison(sourceDatabase, targetDatabase);
+            var comparison = new SchemaComparison(targetDatabase, sourceDatabase);
             Console.WriteLine("Running rollback script creator...");
             SchemaComparisonResult compareResult = comparison.Compare();
 

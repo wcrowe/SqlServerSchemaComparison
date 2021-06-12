@@ -21,9 +21,11 @@ namespace SqlServerSchemaComparison
 
     class Program
     {
-   
+
+        private static string fileDateTimeStamp;
         static void Main(string[] args)
         {
+            fileDateTimeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");
 
             //CommandLine.Parser.Default.ParseArguments<Options>(args)
             //    .WithParsed(RunSchemaCompare);
@@ -39,6 +41,7 @@ namespace SqlServerSchemaComparison
                 RunSchemaCompare(yamldoc);
                 RunRollBackGen(yamldoc);
             }
+            File.Copy("config.yaml", $"config{ fileDateTimeStamp}.yaml");
         }
 
         private static void RunSchemaCompare(YamlSchema options)
@@ -79,20 +82,35 @@ namespace SqlServerSchemaComparison
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
                 Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-
-                    var query = from firstItem in diff.TargetObject.Name.Parts
-                                join secondItem in options.Includes
-                                on firstItem equals secondItem.ObjectName
-                                select firstItem;
-                if (query.Any())
+                if (diff.TargetObject != null)
                 {
-                    Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                    continue;
-                }
-                else
-                {
-                    compareResult.Exclude(diff);
+                    System.Collections.Generic.IEnumerable<string> enumerable()
+                    {
+                        var parts = diff.SourceObject.Name.Parts;
+                        var includes = options.Includes;
+                        foreach (var firstItem in parts)
+                        {
+                            foreach (var secondItem in includes)
+                            {
+                                if (object.Equals(firstItem, secondItem.ObjectName))
+                                {
+                                    yield return firstItem;
+                                }
+                            }
+                        }
+                    }
 
+                    var query = enumerable();
+                    if (query.Any())
+                    {
+                        Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                        continue;
+                    }
+                    else
+                    {
+                        compareResult.Exclude(diff);
+
+                    }
                 }
             }
             //foreach (var diff in compareResult.Differences.Where(x => x.UpdateAction == SchemaUpdateAction.Delete))
@@ -115,7 +133,7 @@ namespace SqlServerSchemaComparison
                 {
                     Console.WriteLine("No differences to script");
                 }
-                using (StreamWriter writer = System.IO.File.CreateText("changes.sql"))
+                using (StreamWriter writer = System.IO.File.CreateText($"changes{fileDateTimeStamp}.sql"))
                 {
                     writer.Write(src);
                     writer.Flush();
@@ -133,32 +151,53 @@ namespace SqlServerSchemaComparison
             if (options.TargetConnectionString is null)
                 throw new ArgumentNullException("target", "The target database connection string is required");
 
-            var sourceDatabaae = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
-            var targetDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
+            var targetDatabase = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
+            var sourceDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
             // Run reverse
-            var comparison = new SchemaComparison(targetDatabase, sourceDatabaae);
+            var comparison = new SchemaComparison(sourceDatabase, targetDatabase);
             Console.WriteLine("Running rollback creator...");
             SchemaComparisonResult compareResult = comparison.Compare();
 
             foreach (SchemaDifference diff in compareResult.Differences)
             {
                 string objectType = diff.Name;
+                //object name "SqlProcedure"
                 string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
                 string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
-
-                var query = from firstItem in diff.TargetObject.Name.Parts
-                            join secondItem in options.Includes
-                            on firstItem equals secondItem.ObjectName
-                            select firstItem;
-                if (query.Any())
+                Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                if (diff.TargetObject != null)
                 {
-                    Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                    continue;
+                    System.Collections.Generic.IEnumerable<string> enumerable()
+                    {
+                        var parts = diff.TargetObject.Name.Parts;
+                        var includes = options.Includes;
+                        foreach (var firstItem in parts)
+                        {
+                            foreach (var secondItem in includes)
+                            {
+                                if (object.Equals(firstItem, secondItem.ObjectName))
+                                {
+                                    yield return firstItem;
+                                }
+                            }
+                        }
+                    }
+
+                    var query = enumerable();
+                    if (query.Any())
+                    {
+                        Console.WriteLine($"Including: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                        continue;
+                    }
+                    else
+                    {
+                        compareResult.Exclude(diff);
+
+                    }
                 }
                 else
                 {
                     compareResult.Exclude(diff);
-
                 }
             }
 
@@ -173,7 +212,7 @@ namespace SqlServerSchemaComparison
                 {
                     Console.WriteLine("No differences to script");
                 }
-                using (StreamWriter writer = System.IO.File.CreateText("rollback.sql"))
+                using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
                 {
                     writer.Write(src);
                     writer.Flush();

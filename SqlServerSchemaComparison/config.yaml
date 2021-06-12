@@ -4,12 +4,16 @@ SourceConnectionString:
   ConnectionString: Data Source=localhost,1401;Initial Catalog=northwind;Persist Security Info=True;User ID=sa;Password=Mustang74
 TargetConnectionString:
   Name: TargetConntion
-  ConnectionString: Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74
+  ConnectionString: Data Source=ASUSHOME\MSSQLSERVER14;Initial Catalog=Northwind;User ID=sa;Password=Mustang74
 Includes:
 - DatabaseName: work
   Schema: dbo
   ObjectType: SqlProcedure
   ObjectName: SelectCustomers
+- DatabaseName: work
+  Schema: dbo
+  ObjectType: SqlProcedure
+  ObjectName: CustOrdersOrders
 - DatabaseName: work
   Schema: dbo
   ObjectType: Table
