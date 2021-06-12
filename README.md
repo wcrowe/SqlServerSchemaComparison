@@ -3,7 +3,7 @@ Wrote this is the middle of the night.
 Insperation https://github.com/reid15/DatabaseCommon 
 Couple of dotnet core programs that automate schema compares.
 Creates change script.
-Crates rollback script.
+Creates rollback script.
 Uses yaml config files.
 
 SqlServerSchemaComparison allows you to specify which databases and which objects to include using config.yaml file.
