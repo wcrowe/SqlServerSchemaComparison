@@ -4,14 +4,13 @@ namespace SqlServerSchemaComparison
 {
     public class YamlSchema
     {
-        public YamlSchema()
-        {
+        public YamlSchema() {
             Includes = new List<Includes>();
-            SourceConnectionString = new Connections();
+             SourceConnectionString = new Connections();
             TargetConnectionString = new Connections();
         }
 
-        public string Comparetype { get; set; }
+        public string? Comparetype { get; set; }
 
         public Connections SourceConnectionString { get; set; }
 

@@ -84,8 +84,9 @@ namespace SqlServerSchemaComparison {
                         var schema = parts[0];
                         var searchFor = parts[1];
                         if (options.Includes.Any(x =>
-                            Includes.ObjectName.ToLower() == searchFor.ToLower() &&
-                            Includes.Schema.ToLower() == schema.ToLower())) { }
+                            x.ObjectName.ToLower() == searchFor.ToLower() &&
+                            x.ObjectType.ToLower() == diff.Name.ToLower() &&
+                            x.Schema.ToLower() == schema.ToLower())) { }
                         else {
                             compareResult.Exclude(diff);
                         }
@@ -147,8 +148,9 @@ namespace SqlServerSchemaComparison {
                         var schema = parts[0];
                         var searchFor = parts[1];
                         if (options.Includes.Any(x =>
-                            Includes.ObjectName.ToLower() == searchFor.ToLower() &&
-                            Includes.Schema.ToLower() == schema.ToLower())) { }
+                            x.ObjectName.ToLower() == searchFor.ToLower() &&
+                            //x.DatabaseName.ToLower() == diff.
+                            x.Schema.ToLower() == schema.ToLower())) { }
                         else {
                             compareResult.Exclude(diff);
                         }
