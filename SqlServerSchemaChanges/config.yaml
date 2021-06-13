@@ -1,10 +1,10 @@
 Comparetype: ConnectionStrings
 SourceConnectionString:
   Name: SourceConntion
-  ConnectionString: Data Source=localhost,1401;Initial Catalog=northwind;Persist Security Info=True;User ID=sa;Password=Mustang74
+  ConnectionString: Data Source=localhost,1401;Initial Catalog=gateway;Persist Security Info=True;User ID=sa;Password=Mustang74
 TargetConnectionString:
   Name: TargetConntion
-  ConnectionString: Data Source=ASUSHOME\MSSQLSERVER14;Initial Catalog=Northwind;User ID=sa;Password=Mustang74
+  ConnectionString: Data Source=localhost,1401;Initial Catalog=test;Persist Security Info=True;User ID=sa;Password=Mustang74
 Includes:
 - DatabaseName: work
   Schema: dbo

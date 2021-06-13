@@ -1,6 +1,6 @@
 # SqlServerSchemaComparison
-Quick and dirty written at 3:00AM on a Friday night.
-Insperation https://github.com/reid15/DatabaseCommon 
+
+Insperation https://github.com/reid15/DatabaseCommon (I fixed a bug that was wiping out SET ANSI_WARNINGS ON.  ) 
 Couple of dotnet core programs that automate schema compares.
 Creates change script.
 Creates rollback script.
