@@ -1,6 +1,6 @@
-﻿using Microsoft.SqlServer.Dac.Compare;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.SqlServer.Dac.Compare;
 using YamlDotNet.Serialization;
 
 namespace SqlServerSchemaChanges
@@ -13,7 +13,7 @@ namespace SqlServerSchemaChanges
         static void Main(string[] args)
         {
             fileDateTimeStamp = DateTime.Now.ToString("yyyyMMddhhmmss");
-            using (StreamReader reader = System.IO.File.OpenText("config.yaml"))
+            using (StreamReader reader = File.OpenText("config.yaml"))
             {
                 var conf = reader.ReadToEnd();
                 var deserializer = new DeserializerBuilder()
@@ -54,7 +54,7 @@ namespace SqlServerSchemaChanges
                 diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText($"changes{fileDateTimeStamp}.sql"))
+            using (StreamWriter writer = File.CreateText($"changes{fileDateTimeStamp}.sql"))
             {
                 writer.Write(src);
                 writer.Flush();
@@ -98,7 +98,7 @@ namespace SqlServerSchemaChanges
                 diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
+            using (StreamWriter writer = File.CreateText($"rollback{fileDateTimeStamp}.sql"))
             {
                 writer.Write(src);
                 writer.Flush();

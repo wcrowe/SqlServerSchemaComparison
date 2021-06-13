@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using YamlDotNet.RepresentationModel;
+﻿using System.IO;
 using YamlDotNet.Serialization;
 using YamlTesting.SqlServerSchemaComparison;
 
@@ -35,12 +33,12 @@ namespace YamlTesting {
             yaml.Includes.Add(includes2);
             var serializer = new Serializer();
             var s = serializer.Serialize(yaml);
-               using (StreamWriter writer = System.IO.File.CreateText("config.yaml"))
+               using (StreamWriter writer = File.CreateText("config.yaml"))
                             {
                                 writer.Write(s);
                                 writer.Flush();
                }
-               using (StreamReader reader = System.IO.File.OpenText("config.yaml")) {
+               using (StreamReader reader = File.OpenText("config.yaml")) {
                    var conf = reader.ReadToEnd();
                    var deserializer = new DeserializerBuilder()
                        .Build();

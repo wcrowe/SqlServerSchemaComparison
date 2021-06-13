@@ -1,8 +1,9 @@
-﻿using CommandLine;
-using Microsoft.SqlServer.Dac.Compare;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using CommandLine;
+using Microsoft.SqlServer.Dac.Compare;
 using YamlDotNet.Serialization;
 
 namespace SqlServerSchemaComparison
@@ -19,38 +20,39 @@ namespace SqlServerSchemaComparison
         public string? TargetConnectionString { get; set; }
     }
 
-    class Program
+    internal static class Program
     {
 
-        private static string fileDateTimeStamp;
-        static void Main(string[] args)
+        private static string? _fileDateTimeStamp;
+
+        private static async Task Main(string[] args)
         {
-            fileDateTimeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            _fileDateTimeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");
 
             //CommandLine.Parser.Default.ParseArguments<Options>(args)
             //    .WithParsed(RunSchemaCompare);
-            using (StreamReader reader = System.IO.File.OpenText("config.yaml"))
+            using (StreamReader reader = File.OpenText("config.yaml"))
             {
-                var conf = reader.ReadToEnd();
+                var conf = await reader.ReadToEndAsync();
                 var deserializer = new DeserializerBuilder()
                     .Build();
 
                 var yamldoc = deserializer.Deserialize<YamlSchema>(conf);
                 //CommandLine.Parser.Default.ParseArguments<Options>(args)
                 //    .WithParsed(RunSchemaCompare);
-                RunSchemaCompare(yamldoc);
-                RunRollBackGen(yamldoc);
+                await RunSchemaCompareAsync(yamldoc);
+                await RunRollBackGenAsync(yamldoc);
             }
-            File.Copy("config.yaml", $"config{ fileDateTimeStamp}.yaml");
+            File.Copy("config.yaml", $"config{ _fileDateTimeStamp}.yaml");
         }
 
-        private static void RunSchemaCompare(YamlSchema options)
+        private static async Task RunSchemaCompareAsync(YamlSchema options)
         {
             //C:\Users\crowe\source\repos\NorthWind\NorthWind\bin\Debug\NorthWind.dacpac
             //  to use a dapac file stuff
             //-d  "C:\Dev\sqlschema\Northwind.dacpac" -t "Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74"
             if (options.SourceConnectionString is null)
-                throw new ArgumentNullException("source", "The source .dacpac file is required");
+                throw new ArgumentNullException("options", "The source .dacpac file is required");
 
             //  to use a dapac file stuff
             //-d  "C:\Dev\sqlschema\Northwind.dacpac" -t "Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74"
@@ -62,7 +64,7 @@ namespace SqlServerSchemaComparison
             //-s  "Data Source=localhost,1401;Initial Catalog=northwind;Persist Security Info=True;User ID=sa;Password=Mustang74" -t "Data Source=localhost,1401;Initial Catalog=work;Persist Security Info=True;User ID=sa;Password=Mustang74"
 
             if (options.TargetConnectionString is null)
-                throw new ArgumentNullException("target", "The target database connection string is required");
+                throw new ArgumentNullException("options", "The target database connection string is required");
 
             var sourceDatabaae = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
             //var sourceDacpac = new SchemaCompareDacpacEndpoint(options.SourceDacPac);
@@ -75,59 +77,56 @@ namespace SqlServerSchemaComparison
             //comparison.ExcludedSourceObjects.Add();
             SchemaComparisonResult compareResult = comparison.Compare();
             string diffs = string.Empty;
-            foreach (SchemaDifference diff in compareResult.Differences)
-            {
-                string objectType = diff.Name;
-                string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
-                string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
-                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
-                Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
-                var parts = diff.SourceObject.Name.Parts;
-                if (parts.Count == 2)
-                {
-                    var searchFor = parts[1];
-                    if (options.Includes.Any(x => x.ObjectName == searchFor))
-                    {
+            if (compareResult.Differences != null) {
+                foreach (SchemaDifference diff in compareResult.Differences) {
+                    string objectType = diff.Name;
+                    string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
+                    string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+                    diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" +
+                             Environment.NewLine;
+                    Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                    var parts = diff.SourceObject?.Name.Parts;
+                    if (parts != null && parts.Count == 2) {
+                        var searchFor = parts[1];
+                        if (options.Includes.Any(x => x.ObjectName == searchFor)) { }
+                        else {
+                            compareResult.Exclude(diff);
+                        }
+
 
                     }
-                    else
-                    {
+                    else {
                         compareResult.Exclude(diff);
                     }
-
-
-                }
-                else
-                {
-                    compareResult.Exclude(diff);
                 }
             }
+
             var src = compareResult.GenerateScript(options.Comparetype).Script;
             if (src == null)
             {
                 diffs += "No differences detected";
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText($"changes{fileDateTimeStamp}.sql"))
+            using (StreamWriter writer = File.CreateText($"changes{_fileDateTimeStamp}.sql"))
             {
-                writer.Write(src);
-                writer.Flush();
+                await writer.WriteAsync(src);
+                await writer.FlushAsync();
             }
-            using (StreamWriter writer = File.CreateText($"differences_{fileDateTimeStamp}.txt"))
+            using (StreamWriter writer = File.CreateText($"differences_{_fileDateTimeStamp}.txt"))
             {
-                writer.Write(diffs);
-                writer.Flush();
+                await writer.WriteAsync(diffs);
+                await writer.FlushAsync();
             }
 
 
         }
 
-        private static void RunRollBackGen(YamlSchema options)
+        private static async Task RunRollBackGenAsync(YamlSchema options)
         {
             if (options.SourceConnectionString is null)
-                throw new ArgumentNullException("source", "The source .dacpac file is required");
+                throw new ArgumentNullException("options", "The source .dacpac file is required");
             if (options.TargetConnectionString is null)
-                throw new ArgumentNullException("target", "The target database connection string is required");
+                throw new ArgumentNullException("options", "The target database connection string is required");
 
             var targetDatabase = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
             var sourceDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
@@ -137,39 +136,34 @@ namespace SqlServerSchemaComparison
 
             Console.WriteLine("Running rollback creator...");
             SchemaComparisonResult compareResult = comparison.Compare();
+            if (compareResult.Differences != null) {
+                foreach (SchemaDifference diff in compareResult.Differences) {
+                    string objectType = diff.Name;
+                    //object name "SqlProcedure"
+                    string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
+                    string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
+                    diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" +
+                             Environment.NewLine;
+                    Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
 
-            foreach (SchemaDifference diff in compareResult.Differences)
-            {
-                string objectType = diff.Name;
-                //object name "SqlProcedure"
-                string sourceObject = diff.SourceObject?.Name.ToString() ?? "null";
-                string targetObject = diff.TargetObject?.Name.ToString() ?? "null";
-                diffs += $"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}" + Environment.NewLine;
-                Console.WriteLine($"Type: {objectType}\tSource: {sourceObject}\tTarget: {targetObject}");
+                    if (diff.SourceObject is null) {
+                        continue;
+                    }
 
-                if (diff.SourceObject is null)
-                {
-                    continue;
-                }
-                var parts = diff.SourceObject.Name.Parts;
+                    var parts = diff.SourceObject.Name.Parts;
 
-                if (parts.Count == 2)
-                {
-                    var searchFor = parts[1];
-                    if (options.Includes.Any(x => x.ObjectName == searchFor))
-                    {
+                    if (parts.Count == 2) {
+                        var searchFor = parts[1];
+                        if (options.Includes.Any(x => x.ObjectName == searchFor)) { }
+                        else {
+                            compareResult.Exclude(diff);
+                        }
+
 
                     }
-                    else
-                    {
+                    else {
                         compareResult.Exclude(diff);
                     }
-
-
-                }
-                else
-                {
-                    compareResult.Exclude(diff);
                 }
             }
 
@@ -178,15 +172,15 @@ namespace SqlServerSchemaComparison
             {
                 Console.WriteLine("No differences to script");
             }
-            using (StreamWriter writer = System.IO.File.CreateText($"rollback{fileDateTimeStamp}.sql"))
+            using (StreamWriter writer = File.CreateText($"rollback{_fileDateTimeStamp}.sql"))
             {
-                writer.Write(src);
-                writer.Flush();
+                await writer.WriteAsync(src);
+                await writer.FlushAsync();
             }
-            using (StreamWriter writer = File.CreateText($"difs_ro{fileDateTimeStamp}.txt"))
+            using (StreamWriter writer = File.CreateText($"difs_ro{_fileDateTimeStamp}.txt"))
             {
-                writer.Write(diffs);
-                writer.Flush();
+                await writer.WriteAsync(diffs);
+                await writer.FlushAsync();
             }
 
 
