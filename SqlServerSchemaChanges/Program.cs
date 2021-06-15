@@ -7,9 +7,14 @@ namespace SqlServerSchemaChanges
 {
     class Program
     {
-        private static string fileDateTimeStamp;
+        /*
+         *
+         *      https://stackoverflow.com/questions/17709669/in-ssdt-schema-compare-how-do-i-ignore-differences-in-objects-of-type-schema
 
-        static void Main(string[] args)
+         *
+         */
+        private static string fileDateTimeStamp;
+          static void Main(string[] args)
         {
             fileDateTimeStamp = DateTime.Now.ToString("yyyyMMddhhmmss");
             using (StreamReader reader = File.OpenText("config.yaml"))
@@ -32,7 +37,6 @@ namespace SqlServerSchemaChanges
                 throw new ArgumentNullException("source", "The source .dacpac file is required");
             if (options.TargetConnectionString is null)
                 throw new ArgumentNullException("target", "The target database connection string is required");
-
             var sourceDatabase = new SchemaCompareDatabaseEndpoint(options.SourceConnectionString.ConnectionString);
             var targetDatabase = new SchemaCompareDatabaseEndpoint(options.TargetConnectionString.ConnectionString);
 

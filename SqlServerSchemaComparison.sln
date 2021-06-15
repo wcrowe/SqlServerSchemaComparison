@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServerSchemaComparison", "SqlServerSchemaComparison\SqlServerSchemaComparison.csproj", "{9388859D-2BDF-4F8C-9730-B793A9D25CD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSchemaChanges", "SqlServerSchemaChanges\SqlServerSchemaChanges.csproj", "{9EDB324C-0C90-4692-810D-9A5F03B55E1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlServerSchemaChanges", "SqlServerSchemaChanges\SqlServerSchemaChanges.csproj", "{9EDB324C-0C90-4692-810D-9A5F03B55E1B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YamlTesting", "YamlTesting\YamlTesting.csproj", "{99439137-384E-4993-8F97-EBEF36F3FF9E}"
 EndProject
@@ -32,11 +32,9 @@ Global
 		{99439137-384E-4993-8F97-EBEF36F3FF9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99439137-384E-4993-8F97-EBEF36F3FF9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F4DC15F-0F01-4A24-945D-338EB97D5970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F4DC15F-0F01-4A24-945D-338EB97D5970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F4DC15F-0F01-4A24-945D-338EB97D5970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F4DC15F-0F01-4A24-945D-338EB97D5970}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E6DA89D2-0FA4-483F-AB6D-96810E0FF546}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6DA89D2-0FA4-483F-AB6D-96810E0FF546}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6DA89D2-0FA4-483F-AB6D-96810E0FF546}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6DA89D2-0FA4-483F-AB6D-96810E0FF546}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
