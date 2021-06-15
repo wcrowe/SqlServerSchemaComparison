@@ -1,16 +1,8 @@
 Comparetype: ConnectionStrings
 SourceConnectionString:
   Name: SourceConntion
-  ConnectionString: Data Source=localhost,1401;Initial Catalog=gateway;Persist Security Info=True;User ID=sa;Password=Mustang74
+  ConnectionString: Data Source=SQLT02W12;Initial Catalog=Gateway;Integrated Security=SSPI;
 TargetConnectionString:
   Name: TargetConntion
-  ConnectionString: Data Source=localhost,1401;Initial Catalog=test;Persist Security Info=True;User ID=sa;Password=Mustang74
-Includes:
-- DatabaseName: work
-  Schema: dbo
-  ObjectType: SqlProcedure
-  ObjectName: SelectCustomers
-- DatabaseName: work
-  Schema: dbo
-  ObjectType: Table
-  ObjectName: Testing
+  ConnectionString: Data Source=SQLP02W12;Initial Catalog=Gateway;Integrated Security=SSPI;
+

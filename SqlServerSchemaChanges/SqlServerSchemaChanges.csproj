@@ -16,4 +16,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Includes.cs" />
+  </ItemGroup>
+
 </Project>

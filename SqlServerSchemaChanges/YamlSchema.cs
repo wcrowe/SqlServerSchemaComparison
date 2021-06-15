@@ -6,7 +6,6 @@ namespace SqlServerSchemaChanges
         {
             public YamlSchema()
             {
-                Includes = new List<Includes>();
                 SourceConnectionString = new Connections();
                 TargetConnectionString = new Connections();
             }
@@ -17,7 +16,6 @@ namespace SqlServerSchemaChanges
 
             public Connections TargetConnectionString { get; set; }
 
-            public List<Includes> Includes { get; set; }
         }
     }
 

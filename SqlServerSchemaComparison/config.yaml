@@ -1,20 +1,17 @@
 Comparetype: ConnectionStrings
 SourceConnectionString:
   Name: SourceConntion
-  ConnectionString: Data Source=localhost,1401;Initial Catalog=northwind;Persist Security Info=True;User ID=sa;Password=Mustang74
+  ConnectionString:  Data Source=SQLS02W12;Initial Catalog=Gateway;Integrated Security=SSPI;
 TargetConnectionString:
   Name: TargetConntion
-  ConnectionString: Data Source=ASUSHOME\MSSQLSERVER14;Initial Catalog=Northwind;User ID=sa;Password=Mustang74
+  ConnectionString: Data Source=SQLT02W12;Initial Catalog=Gateway;Integrated Security=SSPI;
 Includes:
-- DatabaseName: work
-  Schema: dbo
-  ObjectType: SqlProcedure
-  ObjectName: CustOrdersOrders
-- DatabaseName: work
-  Schema: dbo
-  ObjectType: SqlTable
-  ObjectName: Categories
-
+  - Schema: dbo
+    ObjectType: SqlProcedure
+    ObjectName: SelectCustomers
+  - Schema: dbo
+    ObjectType: SqlTable
+    ObjectName: Testing
 
 
   
