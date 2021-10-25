@@ -1,8 +1,8 @@
 Comparetype: ConnectionStrings
 SourceConnectionString:
   Name: SourceConntion
-  ConnectionString: Data Source=SQLT02W12;Initial Catalog=Gateway;Integrated Security=SSPI;
+  ConnectionString: Data Source=localhost;Initial Catalog=work;Integrated Security=SSPI;
 TargetConnectionString:
   Name: TargetConntion
-  ConnectionString: Data Source=SQLP02W12;Initial Catalog=Gateway;Integrated Security=SSPI;
+  ConnectionString: Data Source=localhost;Initial Catalog=workdiff;Integrated Security=SSPI;
 
